@@ -785,7 +785,7 @@
             </div>
 
             <div class="counter-container">
-                <span> NOS HAN VISITADO</span>
+                <span> NOS HAN VISITADO:</span>
                 <span class="counter-digits" id="visitCounter">0000000</span>
             </div>
         </div>
@@ -1000,23 +1000,31 @@
             }
         });
 
-        // LÓGICA DE CONTADOR DE VISITAS DINÁMICO
-        function initVisitorCounter() {
-            const counterElement = document.getElementById('visitCounter');
-            
-            $.getJSON('https://api.countapi.xyz/hit/primerastereo.netlify.app/visits', function(response) {
-                if (response && response.value) {
-                    let formattedCount = String(response.value).padStart(7, '0');
-                    counterElement.textContent = formattedCount;
-                }
-            }).fail(function() {
-                let localVisits = parseInt(localStorage.getItem('ps_visits') || '12485', 10) + 1;
-                localStorage.setItem('ps_visits', localVisits);
-                counterElement.textContent = String(localVisits).padStart(7, '0');
-            });
+        // ==========================================
+// CONTADOR GLOBAL REAL (CounterAPI)
+// ==========================================
+function initVisitorCounter() {
+    const counterElement = document.getElementById('visitCounter');
+    
+    // API global gratuita y estable
+    $.getJSON('https://counterapi.dev/v1/primerastereofm/visits/up', function(response) {
+        if (response && response.count) {
+            // Formatear a 7 dígitos (ej: 0000000)
+            let formattedCount = String(response.count).padStart(7, '0');
+            counterElement.textContent = formattedCount;
+            // Sincronizar respaldo local
+            localStorage.setItem('ps_visits', response.count);
         }
+    }).fail(function() {
+        // Fallback local en caso de estar offline
+        let localVisits = parseInt(localStorage.getItem('ps_visits') || '00000', 10) + 1;
+        localStorage.setItem('ps_visits', localVisits);
+        counterElement.textContent = String(localVisits).padStart(7, '0');
+    });
+}
 
-        initVisitorCounter();
+// Iniciar contador
+initVisitorCounter();
     </script>
 </body>
 </html>
